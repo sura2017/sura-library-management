@@ -10,6 +10,9 @@ const BookList = ({ books, onAction, userRole }) => {
     const { user } = useUser();
     const [selectedDates, setSelectedDates] = useState({});
 
+    // 🚀 NEW: Production API URL from environment variables
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
     // Roles and Permissions
     const isAdmin = userRole === 'admin';
     const isLibrarian = userRole === 'librarian';
@@ -25,7 +28,8 @@ const BookList = ({ books, onAction, userRole }) => {
         }
 
         try {
-            await axios.post('http://localhost:5000/api/borrow/borrow', {
+            // Updated to use dynamic API_URL
+            await axios.post(`${API_URL}/api/borrow/borrow`, {
                 clerkId: user.id,
                 bookId: bookId,
                 dueDate: isStaff ? librarianDate : null 
@@ -41,7 +45,8 @@ const BookList = ({ books, onAction, userRole }) => {
     const handleDelete = async (bookId, title) => {
         if (window.confirm(`⚠️ ADMIN: Permanently remove "${title}" from the library inventory?`)) {
             try {
-                await axios.delete(`http://localhost:5000/api/books/${bookId}`);
+                // Updated to use dynamic API_URL
+                await axios.delete(`${API_URL}/api/books/${bookId}`);
                 alert("🗑️ Book deleted.");
                 if (onAction) onAction();
             } catch (err) {
@@ -70,7 +75,6 @@ const BookList = ({ books, onAction, userRole }) => {
                             {book.availableCopies > 0 ? `${book.availableCopies} Available` : 'Out of Stock'}
                         </span>
 
-                        {/* Admin Delete Icon - Highly Visible Rose Red */}
                         {isAdmin && (
                             <button 
                                 onClick={() => handleDelete(book._id, book.title)} 
@@ -130,7 +134,7 @@ const BookList = ({ books, onAction, userRole }) => {
                             {book.availableCopies > 0 ? <><BookOpen size={16} /> Borrow Access</> : "Out of Stock"}
                         </button>
 
-                        {/* 2. DIGITAL SOFTWARE BUTTON (The fix for your missing link) */}
+                        {/* 2. DIGITAL SOFTWARE BUTTON */}
                         {book.bookUrl && (
                             <a 
                                 href={book.bookUrl.startsWith('http') ? book.bookUrl : `https://${book.bookUrl}`} 

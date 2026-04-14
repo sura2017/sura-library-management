@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-// 🛡️ ALL icons imported to prevent crashes
+// 🛡️ All icons preserved
 import { 
     CalendarClock, Save, Edit3, XCircle, Clock, 
     CalendarDays, Trash2, DollarSign, CheckCircle2, AlertCircle 
@@ -11,51 +11,65 @@ const HistoryLog = ({ refresh, userRole }) => {
     const [editingId, setEditingId] = useState(null); 
     const [tempDate, setTempDate] = useState(""); 
 
-    // 🚀 CRITICAL: This is how the component knows you are the boss
+    // 🚀 PRODUCTION URL CONFIGURATION
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
     const isAdmin = userRole === 'admin';
 
     const fetchHistory = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/borrow/history');
+            // Updated to use dynamic API_URL
+            const res = await axios.get(`${API_URL}/api/borrow/history`);
             setHistory(res.data);
         } catch (err) {
             console.error("History fetch error");
         }
     };
 
-    useEffect(() => { fetchHistory(); }, [refresh]);
+    useEffect(() => { 
+        fetchHistory(); 
+    }, [refresh]);
 
     // 1. Update Deadline logic
     const handleUpdateDeadline = async (recordId) => {
         if (!tempDate) return setEditingId(null);
         try {
-            await axios.put('http://localhost:5000/api/borrow/update-deadline', {
-                recordId, newDueDate: tempDate
+            // Updated to use dynamic API_URL
+            await axios.put(`${API_URL}/api/borrow/update-deadline`, {
+                recordId, 
+                newDueDate: tempDate
             });
             alert("📅 Deadline Adjusted Successfully.");
             setEditingId(null);
             fetchHistory(); 
-        } catch (err) { alert("Error updating deadline."); }
+        } catch (err) { 
+            alert("Error updating deadline."); 
+        }
     };
 
     // 2. Settle Fine logic (Mark as Paid)
     const handleSettleFine = async (id) => {
         try {
-            await axios.put(`http://localhost:5000/api/borrow/settle-fine/${id}`);
+            // Updated to use dynamic API_URL
+            await axios.put(`${API_URL}/api/borrow/settle-fine/${id}`);
             alert("💰 Balance Cleared: Fine marked as paid.");
             fetchHistory();
-        } catch (err) { alert("Error settling fine."); }
+        } catch (err) { 
+            alert("Error settling fine."); 
+        }
     };
 
     // 3. Delete Record logic (Admin Cleanup)
     const handleDeleteRecord = async (id) => {
         if (window.confirm("⚠️ ADMIN: Permanently remove this transaction from the audit trail?")) {
             try {
-                // This calls router.delete('/:id', deleteHistoryRecord) in your backend
-                await axios.delete(`http://localhost:5000/api/borrow/${id}`);
+                // Updated to use dynamic API_URL
+                await axios.delete(`${API_URL}/api/borrow/${id}`);
                 fetchHistory();
                 alert("🗑️ Record deleted.");
-            } catch (err) { alert("Error deleting record."); }
+            } catch (err) { 
+                alert("Error deleting record."); 
+            }
         }
     };
 
@@ -85,7 +99,6 @@ const HistoryLog = ({ refresh, userRole }) => {
                     </thead>
                     <tbody className="divide-y divide-slate-50">
                         {history.map((h) => {
-                            // Logic to determine if a book is overdue
                             const isLate = new Date() > new Date(h.dueDate) && h.status === 'borrowed' && !h.isFinePaid;
 
                             return (
@@ -101,7 +114,6 @@ const HistoryLog = ({ refresh, userRole }) => {
                                         </p>
                                     </td>
                                     
-                                    {/* DEADLINE COLUMN with Visible Edit Button */}
                                     <td className="py-6">
                                         {h.status === 'borrowed' ? (
                                             editingId === h._id ? (
@@ -137,7 +149,6 @@ const HistoryLog = ({ refresh, userRole }) => {
                                         )}
                                     </td>
 
-                                    {/* STATUS & OVERDUE INDICATORS */}
                                     <td className="py-6">
                                         <div className="flex flex-col gap-1.5">
                                             <div className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-tighter shadow-sm border
@@ -157,10 +168,8 @@ const HistoryLog = ({ refresh, userRole }) => {
                                         </div>
                                     </td>
                                     
-                                    {/* 🗑️ ADMIN ACTION COLUMN: This was the problem area */}
                                     <td className="py-6 text-right pr-4">
                                         <div className="flex justify-end gap-3 items-center">
-                                            {/* Settle Fine Button: Show if late and NOT paid */}
                                             {isLate && (
                                                 <button 
                                                     onClick={() => handleSettleFine(h._id)} 
@@ -171,7 +180,6 @@ const HistoryLog = ({ refresh, userRole }) => {
                                                 </button>
                                             )}
                                             
-                                            {/* 🗑️ Trash Button: ALWAYS show if user is ADMIN */}
                                             {isAdmin && (
                                                 <button 
                                                     onClick={() => handleDeleteRecord(h._id)} 
@@ -182,7 +190,6 @@ const HistoryLog = ({ refresh, userRole }) => {
                                                 </button>
                                             )}
 
-                                            {/* Show return date if book is back */}
                                             {h.status === 'returned' && (
                                                 <div className="flex flex-col items-end">
                                                     <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Logged Return</span>

@@ -3,20 +3,23 @@ import axios from 'axios';
 import { PlusCircle, BookOpen, Layers, Link as LinkIcon, Hash, User } from "lucide-react";
 
 const AddBook = ({ onBookAdded }) => {
+    // 🚀 PRODUCTION URL CONFIGURATION
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
     const [formData, setFormData] = useState({ 
         title: '', 
         author: '', 
         isbn: '', 
         category: '', 
         quantity: 1,
-        bookUrl: '' // 🆕 State for the Digital Software Copy
+        bookUrl: '' 
     });
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            // We send the whole object including the Digital Link
-            await axios.post('http://localhost:5000/api/books/add', {
+            // Updated to use dynamic API_URL
+            await axios.post(`${API_URL}/api/books/add`, {
                 ...formData,
                 availableCopies: formData.quantity 
             });
@@ -28,7 +31,7 @@ const AddBook = ({ onBookAdded }) => {
                 onBookAdded();
             }
 
-            alert("✅ SUCCESS: Book added to physical and digital shelves!");
+            alert("✅ SUCCESS: Book registered in system inventory!");
 
         } catch (err) {
             console.error("Submission Error:", err);
@@ -106,7 +109,7 @@ const AddBook = ({ onBookAdded }) => {
                     </div>
                 </div>
 
-                {/* 4. DIGITAL SOFTWARE COPY (The "Drop" Place) */}
+                {/* 4. DIGITAL SOFTWARE COPY */}
                 <div className="relative group pt-2">
                     <div className="absolute -top-1 left-4 bg-white px-2 text-[9px] font-black text-blue-600 uppercase tracking-widest z-10">
                         Optional: Software Copy

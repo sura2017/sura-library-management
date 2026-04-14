@@ -1,14 +1,22 @@
 {
   "name": "server",
   "version": "1.0.0",
-  "description": "",
+  "description": "Production API for Sura Library Management System",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js"
   },
-  "keywords": [],
-  "author": "",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "mern",
+    "library-system",
+    "automation",
+    "clerk-auth"
+  ],
+  "author": "Sura",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {

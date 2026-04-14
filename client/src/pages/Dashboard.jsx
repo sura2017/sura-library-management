@@ -15,6 +15,10 @@ function Dashboard() {
   const [stats, setStats] = useState({ totalBooks: 0, activeLoans: 0, totalUsers: 0, totalFines: 0 });
   const { user } = useUser();
 
+  // 🚀 PRODUCTION URL CONFIGURATION
+  // This looks at your .env file for VITE_API_URL. If not found, it uses localhost.
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
   const isAdmin = dbUser?.role === 'admin';
   const isLibrarian = dbUser?.role === 'librarian';
   const canManageBooks = isAdmin || isLibrarian;
@@ -23,8 +27,8 @@ function Dashboard() {
   const refreshAllData = async () => {
     try {
       const [booksRes, statsRes] = await Promise.all([
-        axios.get('http://localhost:5000/api/books/all'),
-        axios.get('http://localhost:5000/api/stats')
+        axios.get(`${API_URL}/api/books/all`),
+        axios.get(`${API_URL}/api/stats`)
       ]);
       setBooks(booksRes.data);
       setStats(statsRes.data);
@@ -35,7 +39,7 @@ function Dashboard() {
 
   const fetchProfile = async () => {
     if (user) {
-        const res = await axios.get(`http://localhost:5000/api/users/profile/${user.id}`);
+        const res = await axios.get(`${API_URL}/api/users/profile/${user.id}`);
         setDbUser(res.data);
     }
   };
@@ -44,8 +48,10 @@ function Dashboard() {
     const initializeApp = async () => {
       if (user) {
         // Sync user with our MongoDB
-        await axios.post("http://localhost:5000/api/users/sync", {
-          clerkId: user.id, email: user.primaryEmailAddress.emailAddress, name: user.fullName,
+        await axios.post(`${API_URL}/api/users/sync`, {
+          clerkId: user.id, 
+          email: user.primaryEmailAddress.emailAddress, 
+          name: user.fullName,
         });
         await fetchProfile();
       }
@@ -57,7 +63,7 @@ function Dashboard() {
   // 📧 OVERDUE NOTIFICATION ACTION
   const handleNotifyOverdue = async () => {
     try {
-        const res = await axios.post('http://localhost:5000/api/borrow/notify-overdue');
+        const res = await axios.post(`${API_URL}/api/borrow/notify-overdue`);
         alert(`⚡ Automation Active: ${res.data.message}`);
     } catch (err) {
         alert("Failed to send overdue notifications.");

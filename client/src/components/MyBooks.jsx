@@ -6,6 +6,10 @@ const BookList = ({ books, onAction }) => {
     const { user } = useUser();
     const [selectedDates, setSelectedDates] = useState({});
 
+    // 🚀 PRODUCTION URL CONFIGURATION
+    // This uses your Render link on the internet, or localhost on your computer.
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
     const handleDateChange = (bookId, date) => {
         setSelectedDates({ ...selectedDates, [bookId]: date });
     };
@@ -19,7 +23,8 @@ const BookList = ({ books, onAction }) => {
         }
 
         try {
-            await axios.post('http://localhost:5000/api/borrow/borrow', {
+            // 🔥 URL Updated to use dynamic API_URL
+            await axios.post(`${API_URL}/api/borrow/borrow`, {
                 clerkId: user.id,
                 bookId: bookId,
                 dueDate: dueDate 
@@ -31,7 +36,7 @@ const BookList = ({ books, onAction }) => {
         }
     };
 
-    if (books.length === 0) return <p className="text-gray-500 italic">No books found in library.</p>;
+    if (books.length === 0) return <p className="text-gray-500 italic text-center py-10">No books found in library.</p>;
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
@@ -46,7 +51,7 @@ const BookList = ({ books, onAction }) => {
                         </div>
                         <p className="text-gray-400 text-xs font-medium mb-6 italic">by {book.author}</p>
 
-                        {/* 📅 THIS IS THE CALENDAR SECTION - LOOK FOR THE BLUE BOX */}
+                        {/* 📅 CALENDAR SECTION */}
                         {book.availableCopies > 0 && (
                             <div className="mb-6 p-4 bg-blue-50 rounded-2xl border-2 border-dashed border-blue-200">
                                 <label className="text-[10px] font-black text-blue-700 uppercase block mb-2 tracking-widest text-center">
