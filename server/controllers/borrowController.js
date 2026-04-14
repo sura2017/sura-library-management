@@ -167,7 +167,7 @@ exports.settleFine = async (req, res) => {
         res.status(500).json({ message: "Error" });
     }
 };
-
+// Handles return logic
 // 8. DELETE RECORD (🆕 Admin Trash Cleanup)
 exports.deleteHistoryRecord = async (req, res) => {
     try {
