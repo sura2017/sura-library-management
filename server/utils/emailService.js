@@ -1,33 +1,21 @@
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 
-const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 587, // 🆕 Use 587 instead of 465
-    secure: false, // 🆕 Set to false for port 587
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-    },
-    tls: {
-        rejectUnauthorized: false // 🆕 Helps bypass security blocks on cloud servers
+// Initialize Resend with your API Key
+const resend = new Resend(process.env.RESEND_API_KEY);
+
+const sendEmail = async (to, subject, text) => {
+    try {
+        const data = await resend.emails.send({
+            from: 'Library <onboarding@resend.dev>', // 👈 Free testing email
+            to: [to], // 👈 This will send to your email
+            subject: subject,
+            text: text,
+        });
+
+        console.log("📧 Email sent successfully via Resend API:", data.id);
+    } catch (error) {
+        console.error("❌ Resend API Error:", error.message);
     }
-});
-
-const sendEmail = (to, subject, text) => {
-    const mailOptions = {
-        from: `"Sura Library" <${process.env.EMAIL_USER}>`,
-        to,
-        subject,
-        text
-    };
-
-    transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-            console.log("❌ Email Error:", error.message);
-        } else {
-            console.log("📧 Email sent successfully to: " + to);
-        }
-    });
 };
 
 module.exports = sendEmail;
