@@ -1,20 +1,30 @@
-const { Resend } = require('resend');
-
-// Initialize Resend with your API Key
-const resend = new Resend(process.env.RESEND_API_KEY);
+const axios = require('axios');
 
 const sendEmail = async (to, subject, text) => {
     try {
-        const data = await resend.emails.send({
-            from: 'Library <onboarding@resend.dev>', // 👈 Free testing email
-            to: [to], // 👈 This will send to your email
+        const data = {
+            sender: { 
+                name: "Sura Library", 
+                email: "abrhamsura85@gmail.com" // 👈 Must be the email you used to sign up for Brevo
+            },
+            to: [{ email: to }],
             subject: subject,
-            text: text,
-        });
+            textContent: text
+        };
 
-        console.log("📧 Email sent successfully via Resend API:", data.id);
+        const config = {
+            headers: {
+                'accept': 'application/json',
+                'api-key': process.env.BREVO_API_KEY, // We will set this in Render
+                'content-type': 'application/json'
+            }
+        };
+
+        const response = await axios.post('https://api.brevo.com/v3/smtp/email', data, config);
+        console.log("📧 Real Email Sent to:", to, "| ID:", response.data.messageId);
+
     } catch (error) {
-        console.error("❌ Resend API Error:", error.message);
+        console.error("❌ Brevo API Error:", error.response ? error.response.data : error.message);
     }
 };
 
