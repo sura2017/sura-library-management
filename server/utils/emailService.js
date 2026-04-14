@@ -1,10 +1,15 @@
 const nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 587, // 🆕 Use 587 instead of 465
+    secure: false, // 🆕 Set to false for port 587
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
+    },
+    tls: {
+        rejectUnauthorized: false // 🆕 Helps bypass security blocks on cloud servers
     }
 });
 
@@ -18,7 +23,7 @@ const sendEmail = (to, subject, text) => {
 
     transporter.sendMail(mailOptions, (error, info) => {
         if (error) {
-            console.log("❌ Email Error:", error);
+            console.log("❌ Email Error:", error.message);
         } else {
             console.log("📧 Email sent successfully to: " + to);
         }
