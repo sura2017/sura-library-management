@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+
+:root {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background-color: #F8FAFC;
+}
+
+/* Custom Scrollbar for that SaaS look */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #E2E8F0;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #CBD5E1;
+}
+
+/* Make inputs look modern */
+input, select {
+  transition: all 0.2s ease-in-out;
+}
